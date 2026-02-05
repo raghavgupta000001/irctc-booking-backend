@@ -1,6 +1,26 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from models import BookingRequest
+from storage import start_next_booking, get_booking
+@app.post("/agent/complete/{booking_id}")
+def agent_complete(booking_id: str):
+    complete_booking(booking_id)
+    return {"message": "Booking marked as completed"}
+
+@app.post("/agent/get-next")
+def agent_get_next():
+    booking_id = start_next_booking()
+    if not booking_id:
+        return {"job": None}
+
+    booking = get_booking(booking_id)
+    return {
+        "job": {
+            "booking_id": booking_id,
+            "data": booking["data"]
+        }
+    }
+
 from storage import (
     create_booking,
     get_booking,
